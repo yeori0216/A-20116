@@ -261,9 +261,9 @@ st.divider()
 
 
 # -------------------------------------------------------------------
-# [여섯 번째 그래프: 캘린더 히트맵 (X축: 요일, Y축: 주차별 관객수)]
+# [여섯 번째 그래프: 캘린더 히트맵 (주차별 x 요일별 관객수)]
 # -------------------------------------------------------------------
-st.subheader("🗓️ 6. 캘린더 히트맵 (요일 x 주차별 관객수)")
+st.subheader("🗓️ 6. 캘린더 히트맵 (주차 x 요일별 관객수)")
 
 # 1) 날짜 관련 파생 컬럼 생성
 cal_df = daily_total.copy()
@@ -274,29 +274,29 @@ day_map = {0: "월", 1: "화", 2: "수", 3: "목", 4: "금", 5: "토", 6: "일"}
 cal_df["요일_num"] = cal_df["기준일자"].dt.weekday
 cal_df["요일"] = cal_df["요일_num"].map(day_map)
 
-# 연월 및 주차 컬럼 (Y축 레이블용)
+# 연월 및 주차 컬럼 (X축 레이블용)
 cal_df["주차"] = cal_df["기준일자"].dt.strftime("%Y-%m (%W주차)")
 
-# 2) 요일 순서 보장을 위한 정렬 처리 (월요일 -> 일요일)
+# 2) 요일 순서 보장을 위한 정렬 처리
 days_order = ["월", "화", "수", "목", "금", "토", "일"]
 
-# 3) Plotly Express density_heatmap 생성 (X: 요일, Y: 주차)
+# 3) Plotly Express density_heatmap 생성
 fig_cal = px.density_heatmap(
     cal_df,
-    x="요일",
-    y="주차",
+    x="주차",
+    y="요일",
     z="해당일관객수",
-    category_orders={"요일": days_order},  # X축 요일 순서 고정
+    category_orders={"요일": days_order},  # 월요일부터 일요일 순서 고정
     color_continuous_scale="Reds",  # 관객수가 많을수록 진한 붉은색
-    title="요일별/주차별 극장가 관객수 분포 히트맵",
+    title="주차별/요일별 극장가 관객수 분포 히트맵",
     labels={
-        "요일": "요일",
         "주차": "월 및 주차",
+        "요일": "요일",
         "해당일관객수": "일일 관객수(명)",
     },
     hover_data={
-        "요일": False,
         "주차": False,
+        "요일": False,
         "날짜_str": True,  # 마우스 호버 시 yyyy-mm-dd 표시
         "해당일관객수": ":,명",  # 천 단위 쉼표 포맷팅
     },
@@ -307,15 +307,12 @@ fig_cal.update_traces(
     hovertemplate="<b>날짜: %{customdata[0]}</b><br>관객수: %{z:,}명<extra></extra>"
 )
 
-fig_cal.update_layout(
-    xaxis_type="category",
-    yaxis=dict(autorange="reversed"),  # 주차가 위에서 아래로 시간순 정렬되도록 반전
-)
+fig_cal.update_layout(xaxis_type="category")
 
 # Streamlit에 Plotly 그래프 출력
 st.plotly_chart(fig_cal, use_container_width=True)
 
 # 그래프 설명 문구 자리
 st.info(
-    "💡 **이 그래프로 알 수 있는 것:** 달력처럼 주차별(Y축) 흐름에 따른 요일별(X축) 관객 수 변화를 시각적으로 한눈에 확인하여 특정 날짜와 연휴 기간의 관객 집중도를 파악할 수 있습니다."
+    "💡 **이 그래프로 알 수 있는 것:** 주말(토·일)과 평일 간의 요일별 관객 차이는 물론, 특정 연휴나 성수기 주차에 관객이 얼마나 집중되었는지 달력 형태의 진함 정도로 한눈에 파악할 수 있습니다."
 )
