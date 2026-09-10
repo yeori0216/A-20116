@@ -216,3 +216,43 @@ st.plotly_chart(fig_ma, use_container_width=True)
 st.info(
     "💡 **이 그래프로 알 수 있는 것:** 평일과 주말 간의 심한 관객수 편차(노이즈)를 7일 이동평균으로 완화하여, 전체 극장가의 성수기/비수기 시즌성 흐름과 전반적인 시장 규모 변화를 한눈에 파악할 수 있습니다."
 )
+
+st.divider()
+
+
+# -------------------------------------------------------------------
+# [다섯 번째 그래프: 월별 전체 관객수 합계 (막대그래프)]
+# -------------------------------------------------------------------
+st.subheader("📊 5. 월별 전체 관객수 합계")
+
+# 1) 기준일자에서 '연-월(YYYY-MM)' 형태의 컬럼 생성
+daily_total["연월"] = daily_total["기준일자"].dt.to_period("M").astype(str)
+
+# 2) 월(연월) 단위로 다시 그룹화하여 전체 관객수 합계 계산
+monthly_total = (
+    daily_total.groupby("연월")["해당일관객수"].sum().reset_index()
+)
+
+# 3) Plotly 막대그래프 생성
+fig_monthly = px.bar(
+    monthly_total,
+    x="연월",
+    y="해당일관객수",
+    title="월별 극장가 총 관객수 합계 비교",
+    labels={"연월": "월(Year-Month)", "해당일관객수": "월 총 관객수(명)"},
+    text_auto=".2s",  # 막대 위에 축약 형태의 수치 표시 (예: 1.5M)
+)
+
+# 레이아웃 커스텀
+fig_monthly.update_traces(
+    marker_color="royalblue", textposition="outside"
+)
+fig_monthly.update_layout(xaxis_type="category")
+
+# Streamlit에 Plotly 그래프 출력
+st.plotly_chart(fig_monthly, use_container_width=True)
+
+# 그래프 설명 문구 자리
+st.info(
+    "💡 **이 그래프로 알 수 있는 것:** 연중 어떤 월에 총 관객수가 가장 많았는지 비교하여, 극장가의 월별 성수기/비수기 매출 및 흥행 집계 규모를 직관적으로 파악할 수 있습니다."
+)
