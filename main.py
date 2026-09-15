@@ -129,3 +129,41 @@ st.info(
     f"오른쪽으로 갈수록 편수가 급격히 줄어드는 롱테일 분포를 보입니다. "
     f"이 중 가장 많은 관객을 모은 영화는 **'{top_movie_name}'**(총 {top_movie_audi:,.0f}명)입니다."
 )
+
+st.divider()
+
+# ----------------------------------------------------
+# 4. 개봉일 스크린수 vs 총 관객수 (산점도)
+# ----------------------------------------------------
+st.subheader("4. 개봉일 스크린 수와 총 관객 수의 관계")
+
+# Plotly 산점도 생성
+fig_scatter = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    color="primary_genre",
+    hover_name="movieNm",
+    title="개봉일 스크린 수(first_scrn) vs 총 관객 수(total_audi)",
+    labels={
+        "first_scrn": "개봉일 스크린 수 (개)",
+        "total_audi": "총 관객 수 (명)",
+        "primary_genre": "장르",
+    },
+)
+
+fig_scatter.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린 수: %{x:,}개<br>총 관객 수: %{y:,}명<extra></extra>"
+)
+
+fig_scatter.update_layout(
+    xaxis_title="개봉일 스크린 수 (개)",
+    yaxis_title="총 관객 수 (명)",
+)
+
+st.plotly_chart(fig_scatter, use_container_width=True)
+
+# 그래프 해석 안내 영역
+st.info(
+    "💡 **이 그래프로 알 수 있는 것:** 개봉일 스크린 수가 많을수록 대체로 총 관객 수가 늘어나는 양의 상관관계를 보이나, 스크린 수가 적음에도 높은 관객 수를 기록한 흥행 이탈작이나 그 반대의 사례도 장르별로 확인할 수 있습니다."
+)
