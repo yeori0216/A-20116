@@ -208,3 +208,44 @@ st.plotly_chart(fig_box, use_container_width=True)
 st.info(
     "💡 **이 그래프로 알 수 있는 것:** 장르별 중간값(중앙선)을 통해 평균적인 흥행 규모를 비교할 수 있으며, 상자 밖으로 점으로 돌출된 대형 흥행 이탈작(Outlier)의 존재 유무와 흥행 편차를 확인할 수 있습니다."
 )
+
+st.divider()
+
+# ----------------------------------------------------
+# 6. 개봉일 스크린수 vs 총 관객수 vs 개봉 첫 주 관객수 (버블 차트)
+# ----------------------------------------------------
+st.subheader("6. 개봉일 스크린 수, 총 관객 수, 개봉 첫 주 관객 수의 관계 (버블 차트)")
+
+# Plotly 버블 차트 생성 (크기 = first_week_audi)
+fig_bubble = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    size="first_week_audi",
+    color="primary_genre",
+    hover_name="movieNm",
+    size_max=40,
+    title="개봉일 스크린 수 vs 총 관객 수 (원 크기 = 개봉 첫 주 관객 수)",
+    labels={
+        "first_scrn": "개봉일 스크린 수 (개)",
+        "total_audi": "총 관객 수 (명)",
+        "first_week_audi": "개봉 첫 주 관객 수 (명)",
+        "primary_genre": "장르",
+    },
+)
+
+fig_bubble.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린 수: %{x:,}개<br>총 관객 수: %{y:,}명<extra></extra>"
+)
+
+fig_bubble.update_layout(
+    xaxis_title="개봉일 스크린 수 (개)",
+    yaxis_title="총 관객 수 (명)",
+)
+
+st.plotly_chart(fig_bubble, use_container_width=True)
+
+# 그래프 해석 안내 영역
+st.info(
+    "💡 **이 그래프로 알 수 있는 것:** 버블(원)의 크기를 통해 초반 기선제압(개봉 첫 주 성적)에 성공한 영화들이 최종 관객 수 및 초기 스크린 확보 수와 어떠한 세 가지 축의 관계를 보이는지 다차원적으로 파악할 수 있습니다."
+)
