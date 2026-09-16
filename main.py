@@ -269,33 +269,40 @@ st.info(
 st.divider()
 
 # ----------------------------------------------------
-# 8. 장르별 Top 10 랭킹 유지 기간
+# 8. 영화 장르별 총 관객 수 비교
 # ----------------------------------------------------
-st.subheader("8. 장르별 Top 10 랭킹 유지 기간")
+st.subheader("8. 영화 장르별 총 관객 수 비교")
 
-fig_rank_box = px.box(
-    df_filtered,
-    x="primary_genre",
-    y="days_in_top10",
-    color="primary_genre",
-    hover_data=["movieNm"],
-    points="all",
-    title="주요 장르별 박스오피스 Top 10 머문 날수(days_in_top10) 분포",
-    labels={
-        "primary_genre": "장르",
-        "days_in_top10": "Top 10 머문 날수 (일)",
-        "movieNm": "영화명",
-    },
+# 장르별 총 관객 수 합계 및 내림차순 정렬
+genre_audi_df = (
+    df.groupby("primary_genre")["total_audi"]
+    .sum()
+    .reset_index()
+    .sort_values(by="total_audi", ascending=False)
 )
 
-fig_rank_box.update_layout(
+fig_genre_audi = px.bar(
+    genre_audi_df,
+    x="primary_genre",
+    y="total_audi",
+    color="primary_genre",
+    title="장르별 총 관객 수 합계 비교",
+    labels={"primary_genre": "장르", "total_audi": "총 관객 수 (명)"},
+    text_auto=".2s",  # 막대 상단 숫자를 정돈된 표기로 표시
+)
+
+fig_genre_audi.update_traces(
+    hovertemplate="<b>장르: %{x}</b><br>총 관객 수: %{y:,}명<extra></extra>"
+)
+
+fig_genre_audi.update_layout(
     xaxis_title="장르",
-    yaxis_title="Top 10 머문 날수 (일)",
+    yaxis_title="총 관객 수 (명)",
     showlegend=False,
 )
 
-st.plotly_chart(fig_rank_box, use_container_width=True)
+st.plotly_chart(fig_genre_audi, use_container_width=True)
 
 st.info(
-    "💡 **이 그래프로 알 수 있는 것:** 장르별로 박스오피스 상위권에 오랫동안 살아남는 '롱런' 장르가 무엇인지, 평균 유지 기간과 최장 머문 영화들의 분포 차이를 직관적으로 알 수 있습니다."
+    "💡 **이 그래프로 알 수 있는 것:** 시장 전체에서 가장 많은 관객을 끌어모은 흥행 주도 장르부터 상대적으로 관객 파이가 작은 비인기 장르까지 총 관객 수의 규모 차이를 직관적으로 비교할 수 있습니다."
 )
